@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/MyStyle.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+   <title>Title</title>
+</head>
+<body class="p-5"> 
+<div class="container" id='app'>
+    <div class="modal fade bd-example-modal-md" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+     <div class="modal-dialog modal-md">
+      <div class="modal-content pt-4 pb-4 text-center">
+      ...
+      </div>
+     </div>
+    </div>
+    <div class="row border border-dark container-popup-img" v-if='fileM == true'>
+        <div class="myPopupImg">
+            <svg @click="closePopupImg()"  class="close-btn" viewBox="0 0 24 24">
+                <path   d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z" />
+            </svg>  
+        </div>
+        <div class="col-4  column"><a href="#/filterTitle " :class="{ selected: visibility == 'sortT' }" class="link-file pl-3" @click="sort()">File name ^</a></div>
+        <div class="col-2 text-center   column "><a href="#" class="link-type ">File Type</a></div>
+        <div class="col-2 text-center  column "><a href="#/filterSize " @click="sortS()" :class="{ selected: visibility == 'sortS' }" class="link-size ">Size (kb)^</a></div>
+        <div class="col-4  "><a href="#" class="link-action">Action</a></div>
+        <div v-for="f in filreredSearch"
+        class="file col-12 "
+        :key="f.id"
+        :class="{ bookmarks: f.bookmarks, editing: f == editedFile }" @click='isActiveCheck(f)'>
+            <div class="row select-row " >
+                <div class="col-4 border border-left-0 border-dark border-bottom-0 border-top-0"> 
+                  
+                    <label class="title-file" > 
+                        <svg v-if='f.bookmarks == true' style="width:16px;height:16px" viewBox="0 0 24 24">
+                             <path fill="#000000" d="M17,3H7A2,2 0 0,0 5,5V21L12,18L19,21V5C19,3.89 18.1,3 17,3Z" />
+                        </svg>
+                    {{ f.title }}
+                </label>
+            </div>
+                <div class="col-2 text-center border border-left-0 border-dark border-bottom-0 border-top-0">
+                    <label >{{ f.type}} </label>
+            </div>
+
+            <div class="col-2 text-center border border-left-0 border-dark border-bottom-0 border-top-0"> 
+                <label >{{parseInt( f.size / 1024)}} kb</label>
+            </div>
+        <div v-show='f.menu == true'  class=" col-4 border menu border-dark border-left-0 border-right-0 border-bottom-0 border-top-0"> 
+            <div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    menu
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <span @click="previewImage(f)">
+            <svg style="width:16px;height:16px"  class='position_svg_menu' viewBox="0 0 24 24">
+                <path fill="#000000" d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" />
+            </svg>
+                preview
+            </span><br>
+            <hr>
+            <span class="destroy" @click="removeFile(f)">
+                <svg style="width:16px;height:16px"  class='position_svg_menu' viewBox="0 0 24 24">
+                    <path fill="#000000" d="M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2C6.47,2 2,6.47 2,12C2,17.53 6.47,22 12,22C17.53,22 22,17.53 22,12C22,6.47 17.53,2 12,2M14.59,8L12,10.59L9.41,8L8,9.41L10.59,12L8,14.59L9.41,16L12,13.41L14.59,16L16,14.59L13.41,12L16,9.41L14.59,8Z" />
+                </svg>
+              Delete
+            </span><br>
+            <hr>
+            <span class="save-file" @click="saveFile(f)">
+                <svg style="width:16px;height:16px" class='position_svg_menu' viewBox="0 0 24 24">
+                    <path fill="#000000" d="M12,17L7,12H10V8H14V12H17L12,17M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />
+                 </svg>
+                Save
+            </span><br>
+            <hr>
+            <span @click="editFile(f)">
+            <svg style="width:16px;height:16px"  class='position_svg_menu' viewBox="0 0 24 24">
+                <path fill="#000000" d="M17,3H7A2,2 0 0,0 5,5V21L12,18L19,21V5C19,3.89 18.1,3 17,3Z" />
+            </svg>  
+                Add to bookmarks
+            </span><br>
+  </div>
+</div>
+           
+        </div>
+    </div>
+</div>
+    <div class="col-12 navigation" > 
+        <div><input type="text" v-model="search" class="search pl-2" placeholder="search file" name=""></div>
+  <div class="footer" v-cloak>
+    <div class="filters" >
+      <a href="#/all" :class="{ selected: visibility == 'all' }" class="by_btn">File list</a>
+     <a href="#/active" :class="{ selected: visibility == 'active' }" class="by_btn">Bookmarks</a>
+     <button @click="createFile()" class="float-right ml-3">create file</button>
+     <input class="new-file float-right" type="file" id="new-file" leng='en' autofocus autocomplete="off" @change.prevent="addFile" >
+    </div>
+      </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/vue"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+<script src="js/mainJs.js" type="text/javascript"> </script>
+</body>
+</html>
